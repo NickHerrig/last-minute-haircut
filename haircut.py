@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-import shelve
+import json
 
 import requests
 
@@ -27,6 +27,7 @@ def format_appointments(barbers_appointments):
     for barber, appointments in barbers_appointments.items():
         formated_appointments = [ datetime.strptime(apt[:-1], '%Y%m%d') for apt in appointments ]
         barbers_formated_appointments[barber] = formated_appointments
+
     return barbers_formated_appointments
 
 def parse_barbers_appointments(barbers_json):
@@ -43,7 +44,10 @@ def main():
             api_response = requests.get(url)
         except Exception as e:
             raise e
-        barbers_api_responses[barber] = api_response.json()
+        try:
+            barbers_api_responses[barber] = api_response.json()
+        except json.JSONDecodeError as e:
+            raise e
 
     barbers_appointments = parse_barbers_appointments(barbers_api_responses)
     barbers_formated_appointments = format_appointments(barbers_appointments)
