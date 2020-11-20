@@ -12,7 +12,6 @@ barbers_urls = {
     'paul':'https://www.genbook.com/bookings/api/serviceproviders/30309745/services/1603733980/resources/1603733984',
     'kegan':'https://www.genbook.com/bookings/api/serviceproviders/30352805/services/2098565278/resources/2098565282?',
 }
-    #[date.strftime('%b/%d/%Y') for date in available_apointments if date < week_from_today]
 
 def get_this_weeks_appointments(barbers_datetime_appointments):
     barbers_formated_appointments = {}
