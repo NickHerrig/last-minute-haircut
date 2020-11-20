@@ -1,12 +1,9 @@
 from datetime import datetime, timedelta
-from pprint import pprint
 import shelve
 
 import requests
 
-from pymail import send_email
-
-barbers_endpoints = {
+barbers_urls = {
     'jordan':'https://www.genbook.com/bookings/api/serviceproviders/30230662/services/989056738/resources/989056742?',
     'pete': 'https://www.genbook.com/bookings/api/serviceproviders/31191440/services/10282291592/resources/10282190294',
     'brandon':'https://www.genbook.com/bookings/api/serviceproviders/30377943/services/2394050193/resources/2394025610',
@@ -15,42 +12,47 @@ barbers_endpoints = {
     'paul':'https://www.genbook.com/bookings/api/serviceproviders/30309745/services/1603733980/resources/1603733984',
     'kegan':'https://www.genbook.com/bookings/api/serviceproviders/30352805/services/2098565278/resources/2098565282?',
 }
+    #[date.strftime('%b/%d/%Y') for date in available_apointments if date < week_from_today]
 
-
-def get_available_appointments(barber):
-    try:
-        genbook_response = requests.get(barbers_endpoints[barber])
-        if genbook_response.status_code != 200:
-            print("Unable to reach genbook endpoint")
-            raise SystemExit
-        return genbook_response.json()['dates']
-
-    except KeyError:
-        print("No barber: {} in barber endpoints".format(barber))
-        raise SystemExit
-
-
-def this_weeks_appointments(appointments):
-    available_apointments = [datetime.strptime(date[:-1],'%Y%m%d') for date in appointments]
+def get_this_weeks_appointments(barbers_datetime_appointments):
+    barbers_formated_appointments = {}
     week_from_today = datetime.today() + timedelta(days=7)
-    return [date.strftime('%b/%d/%Y') for date in available_apointments if date < week_from_today]
+    for barber, appointments in barbers_datetime_appointments.items():
+        last_minute_appointments = [ apt.strftime('%b/%d/%Y') for apt in appointments if apt < week_from_today]
+        barbers_formated_appointments[barber] = last_minute_appointments
 
+    return barbers_formated_appointments
+
+def format_appointments(barbers_appointments):
+    barbers_formated_appointments = {}
+    for barber, appointments in barbers_appointments.items():
+        formated_appointments = [ datetime.strptime(apt[:-1], '%Y%m%d') for apt in appointments ]
+        barbers_formated_appointments[barber] = formated_appointments
+    return barbers_formated_appointments
+
+def parse_barbers_appointments(barbers_json):
+    barbers_appointments = {}
+    for barber, json in barbers_json.items():
+        barbers_appointments[barber] = json['dates']
+
+    return barbers_appointments
 
 def main():
-    for barber in barbers_endpoints.keys():
-        all_appointments = get_available_appointments(barber)
-        last_minute_appointments = this_weeks_appointments(all_appointments)
-        print(barber, last_minute_appointments)
+    barbers_api_responses = {}
+    for barber, url in barbers_urls.items():
+        try:
+            api_response = requests.get(url)
+        except Exception as e:
+            raise e
+        barbers_api_responses[barber] = api_response.json()
 
-        with shelve.open('db') as db:
-            for appt in last_minute_appointments:
-                unique_key = barber + appt
-                key_exists = unique_key in db
+    barbers_appointments = parse_barbers_appointments(barbers_api_responses)
+    barbers_formated_appointments = format_appointments(barbers_appointments)
+    barbers_last_minute_appointments = get_this_weeks_appointments(barbers_formated_appointments)
 
-                if not key_exists:
-                    send_email("6302349125@txt.att.net", "{} has availability!".format(barber), appt)
-                    db[unique_key]=appt
+    from pprint import pprint
+    pprint(barbers_last_minute_appointments)
+    #TODO do something with data
 
 if __name__ == '__main__':
     main()
-
