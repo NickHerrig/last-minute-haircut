@@ -3,14 +3,15 @@ from datetime import datetime, timedelta
 
 import requests
 
+genbook_url = 'https://www.genbook.com/bookings/api/serviceproviders'
 barbers_urls = {
-    'jordan': 'https://www.genbook.com/bookings/api/serviceproviders/30230662/services/989056738/resources/989056742?',
-    'pete': 'https://www.genbook.com/bookings/api/serviceproviders/31191440/services/10282291592/resources/10282190294',
-    'brandon': 'https://www.genbook.com/bookings/api/serviceproviders/30377943/services/2394050193/resources/2394025610',
-    'luis': 'https://www.genbook.com/bookings/api/serviceproviders/30250062/services/1173749692/resources/1173749696',
-    'zach': 'https://www.genbook.com/bookings/api/serviceproviders/30302725/services/1547629284/resources/1547629288',
-    'paul': 'https://www.genbook.com/bookings/api/serviceproviders/30309745/services/1603733980/resources/1603733984',
-    'kegan': 'https://www.genbook.com/bookings/api/serviceproviders/30352805/services/2098565278/resources/2098565282?',
+    'jordan':  f'{genbook_url}/30230662/services/989056738/resources/989056742?',
+    'pete':    f'{genbook_url}/31191440/services/10282291592/resources/10282190294',
+    'brandon': f'{genbook_url}/30377943/services/2394050193/resources/2394025610',
+    'luis':    f'{genbook_url}/30250062/services/1173749692/resources/1173749696',
+    'zach':    f'{genbook_url}/30302725/services/1547629284/resources/1547629288',
+    'paul':    f'{genbook_url}/30309745/services/1603733980/resources/1603733984',
+    'kegan':   f'{genbook_url}/30352805/services/2098565278/resources/2098565282?',
 }
 
 
@@ -62,7 +63,8 @@ def main():
 
     from pprint import pprint
     pprint(appointments)
-    # TODO do something with data
+    # TODO Do something with the data?
+    # Store data in sqlite database?
 
 
 if __name__ == '__main__':
