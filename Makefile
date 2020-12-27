@@ -1,18 +1,21 @@
 SHELL := /bin/bash
 
-.DEFAULT_GOAL := help
+.PHONY: default
+default: run
 
-.PHONY: build
-install:
-	python3 -m venv .venv
-	( \
-		source .venv/bin/activate; \
-		pip install -r requirements.txt; \
-	)
+.PHONY: deps 
+deps:
+	python3 -m venv venv/
+	./venv/bin/pip install -Uq wheel
+	./venv/bin/pip install -Uq -r requirements.txt
+
+.PHONY: run 
+run: deps 
+	./venv/bin/python3 haircut.py 
 
 .PHONY: clean
 clean: 
-	rm -rf ./.venv 
+	rm -rf ./venv 
 
 .PHONY: help
 help:
