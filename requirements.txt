@@ -9,3 +9,5 @@ pyflakes==2.2.0
 requests==2.25.0
 testfixtures==6.15.0
 urllib3==1.26.2
+fastapi==0.63.0
+uvicorn[standard]

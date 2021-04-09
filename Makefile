@@ -13,6 +13,10 @@ deps:
 run: deps 
 	./venv/bin/python3 haircut.py 
 
+.PHONY: serve 
+serve: deps 
+	./venv/bin/uvicorn haircut:app --host 0.0.0.0
+
 .PHONY: clean
 clean: 
 	rm -rf ./venv 

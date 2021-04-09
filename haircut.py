@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 import requests
+from fastapi import FastAPI, Response
 
 genbook_url = 'https://www.genbook.com/bookings/api/serviceproviders'
 barbers_urls = {
@@ -15,7 +16,10 @@ barbers_urls = {
 }
 
 
-def get_this_weeks_appointments(barbers_datetime_appointments):
+app = FastAPI()
+
+
+def get_this_weeks_appointments(barbers_datetime_appointments: dict):
     barbers_formated_appointments = {}
     week_from_today = datetime.today() + timedelta(days=7)
     for barber, appointments in barbers_datetime_appointments.items():
@@ -27,7 +31,7 @@ def get_this_weeks_appointments(barbers_datetime_appointments):
     return barbers_formated_appointments
 
 
-def format_appointments(barbers_appointments):
+def format_appointments(barbers_appointments: dict):
     barbers_formated_appointments = {}
     for barber, appointments in barbers_appointments.items():
         formated_appointments = [datetime.strptime(apt[:-1], '%Y%m%d')
@@ -37,7 +41,7 @@ def format_appointments(barbers_appointments):
     return barbers_formated_appointments
 
 
-def parse_barbers_appointments(barbers_json):
+def parse_barbers_appointments(barbers_json: dict):
     barbers_appointments = {}
     for barber, api_json in barbers_json.items():
         barbers_appointments[barber] = api_json['dates']
@@ -45,27 +49,49 @@ def parse_barbers_appointments(barbers_json):
     return barbers_appointments
 
 
-def main():
+def get_barber_data(barber: str):
+    api_data = {}
+
+    try:
+        api_response = requests.get(barbers_urls[barber])
+    except Exception as e:
+        raise e
+    try:
+        api_data[barber] = api_response.json()
+    except json.JSONDecodeError as e:
+        raise e
+    
+    return api_data
+
+
+def get_barber_data_formatted(barber: str = ''):
     barbers_api_responses = {}
-    for barber, url in barbers_urls.items():
-        try:
-            api_response = requests.get(url)
-        except Exception as e:
-            raise e
-        try:
-            barbers_api_responses[barber] = api_response.json()
-        except json.JSONDecodeError as e:
-            raise e
+
+    if barber:
+        barbers_api_responses = get_barber_data(barber)
+    else:
+        for barber in barbers_urls:
+            barbers_api_responses.update(get_barber_data(barber))
 
     barbers_appointments = parse_barbers_appointments(barbers_api_responses)
     barbers_formated_appointments = format_appointments(barbers_appointments)
     appointments = get_this_weeks_appointments(barbers_formated_appointments)
 
-    from pprint import pprint
-    pprint(appointments)
-    # TODO Do something with the data?
-    # Store data in sqlite database?
+    return appointments
+
+
+@app.get("/")
+def all_open():
+    return get_barber_data_formatted()
+
+
+@app.get('/{barber}')
+def barber(barber: str, response: Response):
+    if barber not in barbers_urls:
+        return {'error': 'not a valid barber'}
+
+    return get_barber_data_formatted(barber)
 
 
 if __name__ == '__main__':
-    main()
+    print(get_barber_data_formatted())
