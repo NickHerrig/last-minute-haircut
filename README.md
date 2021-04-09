@@ -8,6 +8,6 @@
 OS X & Linux:
 
 ```sh
-git pull https://github.com/nickherrig/last-minute-haircut
-make install
+git clone https://github.com/nickherrig/last-minute-haircut
+make run
 ```
