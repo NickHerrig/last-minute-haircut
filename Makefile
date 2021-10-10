@@ -2,20 +2,8 @@ SHELL := /bin/bash
 
 .PHONY: default
 default: run
+	go run ./main.go
 
-.PHONY: deps 
-deps:
-	python3 -m venv venv/
-	./venv/bin/pip install -Uq wheel
-	./venv/bin/pip install -Uq -r requirements.txt
-
-.PHONY: run 
-run: deps 
-	./venv/bin/python3 haircut.py 
-
-.PHONY: clean
-clean: 
-	rm -rf ./venv 
 
 .PHONY: help
 help:
