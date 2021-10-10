@@ -1,17 +1,37 @@
 package main
 
 import (
-    "log"
-    "net/http"
+	"net/http"
+	"log"
+	"os"
+	"encoding/json"
+	"fmt"
+	"time"
 )
 
-func main() {
-  fs := http.FileServer(http.Dir("./static"))
-  http.Handle("/", fs)
+// API url endpoint for Hair Jordan's appointments 
+var url string = "https://www.genbook.com/bookings/api/serviceproviders/30230662/services/989056738/resources/989056742"
 
-  log.Println("Listening on :3000...")
-  err := http.ListenAndServe(":3000", nil)
-  if err != nil {
-    log.Fatal(err)
-  }
+
+func main() {
+	var data map[string]interface{}
+
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	apts := data["bookingdates"]
+	fmt.Println(apts)
+
+	// Parse times into time.Time go objects? 
+
+	// display this data in beautiful tailwind cards
 }
