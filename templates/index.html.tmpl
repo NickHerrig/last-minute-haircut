@@ -23,7 +23,7 @@
                 <div class="text-center">
                     <p class="text-xl text-gray-700 font-bold mb-2">{{.Barber}}</p>
                     {{ range .Appointments }}
-                    <p class="text-base text-gray-400 font-normal">{{.}}</p>
+                    <p class="text-base text-gray-400 font-normal">{{ .Format "Jan 2, 2006"}}</p>
 		    {{ end }}
                 </div>
             </div>
