@@ -69,10 +69,18 @@ func main() {
 	}
 
 	d := Data{"Jordan", lstminapts}
-	tmpl := template.Must(template.ParseFiles("static/index.html"))
+	tmpl := template.Must(template.ParseFiles("templates/index.html.tmpl"))
         http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
             tmpl.Execute(w, d)
         })
+
+	signuptmpl := template.Must(template.ParseFiles("templates/signup.html.tmpl"))
+        http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) {
+            signuptmpl.Execute(w, d)
+        })
+
+        fs := http.FileServer(http.Dir("./static"))
+        http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	err = srv.ListenAndServe()
 	logger.Fatal(err)

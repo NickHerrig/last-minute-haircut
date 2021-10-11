@@ -1,0 +1,23 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/static/css/minireset.css" rel="stylesheet">
+  <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body>
+
+  <section class="py-12 px-4 text-center">
+    <div class="w-full max-w-2xl mx-auto">
+      <span class="text-sm font-semibold">{{.Barber}}</span>
+      {{ range .Appointments }}
+      <h2 class="text-3xl mt-2 mb-6 leading-tight font-semibold font-heading">{{ . }}</h2>
+      {{ end }}
+      <a class="text-indigo-600 hover:underline" href="https://www.genbook.com/bookings/slot/reservation/30230662/989056738/989056742/20211010?ds=1">Book</a>
+    </div>
+  </section>
+
+</body>
+</html>
