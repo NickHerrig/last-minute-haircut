@@ -9,15 +9,24 @@
 </head>
 <body>
 
-  <section class="py-12 px-4 text-center">
-    <div class="w-full max-w-2xl mx-auto">
-      <span class="text-sm font-semibold">{{.Barber}}</span>
-      {{ range .Appointments }}
-      <h2 class="text-3xl mt-2 mb-6 leading-tight font-semibold font-heading">{{ . }}</h2>
-      {{ end }}
-      <a class="text-indigo-600 hover:underline" href="https://www.genbook.com/bookings/slot/reservation/30230662/989056738/989056742/20211010?ds=1">Book</a>
-    </div>
-  </section>
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-4 py-12">
+        <div class="text-center pb-12">
+            <h1 class="font-bold text-3xl md:text-4xl lg:text-5xl font-heading text-gray-900">
+              Last Minute Haircuts 
+            </h1>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="w-full bg-white rounded-lg p-12 flex flex-col justify-center items-center">
+                <div class="mb-8">
+                    <img class="object-center object-cover rounded-full h-36 w-36" src="/static/img/jordan.jpeg" alt="photo">
+                </div>
+                <div class="text-center">
+                    <p class="text-xl text-gray-700 font-bold mb-2">{{.Barber}}</p>
+                    {{ range .Appointments }}
+                    <p class="text-base text-gray-400 font-normal">{{.}}</p>
+		    {{ end }}
+                </div>
+            </div>
+</section>
 
 </body>
-</html>

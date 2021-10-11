@@ -74,11 +74,6 @@ func main() {
             tmpl.Execute(w, d)
         })
 
-	signuptmpl := template.Must(template.ParseFiles("templates/signup.html.tmpl"))
-        http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) {
-            signuptmpl.Execute(w, d)
-        })
-
         fs := http.FileServer(http.Dir("./static"))
         http.Handle("/static/", http.StripPrefix("/static", fs))
 
