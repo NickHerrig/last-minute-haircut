@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+	"html/template"
 )
 
 // API url endpoint for Hair Jordan's appointments 
@@ -14,7 +15,6 @@ var url string = "https://www.genbook.com/bookings/api/serviceproviders/30230662
 
 
 func main() {
-	var data map[string]interface{}
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
@@ -23,15 +23,57 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	var data map[string]interface{}
+
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	apts := data["bookingdates"]
-	fmt.Println(apts)
+	var lstminapts []time.Time
+	for _, apt := range data["bookingdates"].([]interface{}){
 
-	// Parse times into time.Time go objects? 
+		aptstr := apt.(string)
 
-	// display this data in beautiful tailwind cards
+		year :=  aptstr[:4]
+		month := aptstr[4:6]
+		day := aptstr[6:8]
+
+		dts := fmt.Sprintf("%s-%s-%sT00:00:00.000Z", year, month, day)
+
+                t, err := time.Parse(time.RFC3339, dts)
+	        if err != nil {
+			logger.Fatal(err)
+	        }
+
+		now := time.Now()
+		dif := t.Sub(now)
+
+		if dif < 40 * 24 * time.Hour {
+			lstminapts = append(lstminapts, t)
+		}
+
+
+	}
+
+	srv := &http.Server{
+		Addr:         ":4000",
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+	}
+
+	type Data struct {
+		Barber string
+		Appointments []time.Time
+	}
+
+	d := Data{"Jordan", lstminapts}
+	tmpl := template.Must(template.ParseFiles("static/index.html"))
+        http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+            tmpl.Execute(w, d)
+        })
+
+	err = srv.ListenAndServe()
+	logger.Fatal(err)
 }
