@@ -4,29 +4,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="/static/css/minireset.css" rel="stylesheet">
   <link href="/static/css/tailwind.css" rel="stylesheet">
 </head>
 <body>
 
-<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-4 py-12">
-        <div class="text-center pb-12">
-            <h1 class="font-bold text-3xl md:text-4xl lg:text-5xl font-heading text-gray-900">
-              Last Minute Haircuts 
-            </h1>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="w-full bg-white rounded-lg p-12 flex flex-col justify-center items-center">
-                <div class="mb-8">
-                    <img class="object-center object-cover rounded-full h-36 w-36" src="/static/img/jordan.jpeg" alt="photo">
-                </div>
-                <div class="text-center">
-                    <p class="text-xl text-gray-700 font-bold mb-2">{{.Barber}}</p>
-                    {{ range .Appointments }}
-                    <p class="text-base text-gray-400 font-normal">{{ .Format "Jan 2, 2006"}}</p>
-		    {{ end }}
-                </div>
-            </div>
-</section>
+
+<div class="bg-gray-200 font-sans h-screen w-full flex flex-row justify-center items-center">
+  <div class="card w-96 mx-auto py-8 bg-white shadow-xl hover:shadow">
+     <img class="w-32 mx-auto rounded-full -mt-20 border-8 border-white" src="/static/img/jordan.jpeg" alt="">
+     <div class="text-center mt-2 text-3xl font-medium">Hair Jordan</div>
+     {{ if .Appointments }}
+       {{ range .Appointments }}
+       <div class="text-center font-normal text-md">{{ .Format "Jan 2, 2006"}}</div>
+       {{ end }}
+     {{ else }}
+       <div class="text-center font-normal text-md">No last minute appointments.</div>
+     {{ end }}
+       <div></div>
+     </div>
+  </div>
 
 </body>
