@@ -8,13 +8,14 @@
 </head>
 <body>
 
-
+<!--
 <div class="bg-gray-200 font-sans h-screen w-full flex flex-row justify-center items-center">
+{{ range .}} 
   <div class="card w-96 mx-auto py-8 bg-white shadow-xl hover:shadow">
-     <img class="w-32 mx-auto rounded-full -mt-20 border-8 border-white" src="/static/img/jordan.jpeg" alt="">
-     <div class="text-center mt-2 text-3xl font-medium">Hair Jordan</div>
-     {{ if .Appointments }}
-       {{ range .Appointments }}
+     <img class="w-32 mx-auto rounded-full -mt-20 border-8 border-white" src="{{ .Img }}" alt="no image">
+     <div class="text-center mt-2 text-3xl font-medium">{{.Name}}</div>
+     {{ if .Apts }}
+       {{ range .Apts }}
        <div class="text-center font-normal text-md">{{ .Format "Jan 2, 2006"}}</div>
        {{ end }}
      {{ else }}
@@ -22,6 +23,35 @@
      {{ end }}
        <div></div>
      </div>
+{{ end }}
   </div>
-
+-->
+<section class="py-20 xl:bg-contain bg-top bg-no-repeat" style="background-image: url('metis-assets/backgrounds/intersect.svg');">
+  <div class="container px-4 mx-auto">
+    <div class="max-w-lg mx-auto mb-12 text-center">
+      <h2 class="my-2 text-3xl md:text-4xl font-bold font-heading">Last Minute Haircuts</h2>
+    </div>
+    <div class="flex flex-wrap max-w-5xl mx-auto mb-6">
+      {{ range .}}
+      <div class="w-full md:w-1/2 px-3 mb-6">
+        <div class="p-8 bg-white shadow rounded">
+          <div class="flex items-center mb-4">
+            <img class="h-16 w-16 rounded-full object-cover" src="{{ .Img }}" alt="">
+            <div class="pl-4">
+              <p class="text-xl">{{ .Name }}</p>
+            </div>
+          </div>
+          {{ if .Apts }}
+            {{ range .Apts }}
+          <p class="leading-loose text-blueGray-400">{{ .Format "Jan 2, 2006"}}</p>
+            {{ end }}
+          {{ else }}
+            <div class="leading-loose text-blueGray-400">No last minute appointments.</div>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
 </body>
