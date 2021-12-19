@@ -12,9 +12,9 @@ import (
 )
 
 
+// only care about the bookingdates json key
+// silently ignore other data on decode
 type response struct {
-	Timezone     map[string]interface{} `json:"timezone"` // don't care about this data
-	Dates        interface{}            `json:"dates"`    // don't care about this data
 	Bookingdates []string               `json:"bookingdates`
 }
 
