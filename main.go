@@ -1,102 +1,53 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
-	"os"
 	"time"
-//	"sync/atomic"
 )
-
-
-// only care about the bookingdates json key
-// silently ignore other data on decode
-type response struct {
-	Bookingdates []string               `json:"bookingdates`
-}
-
-type barber struct {
-	Name string
-	Img  string
-	Apts []time.Time
-}
 
 func main() {
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	bu := "https://us.booksy.com/api/us/2/customer_api/me/bookings/time_slots/"
+	start := time.Now()
+	s := start.Format("2006-01-02")
+	end := start.Add(14 * 24 * time.Hour)
+	e := end.Format("2006-01-02")
 
-	genbookapi := "https://www.genbook.com/bookings/api/serviceproviders/"
-
-	barberendpoints := map[string]string{
-		"jordan":  fmt.Sprintf("%s/30230662/services/989056738/resources/989056742", genbookapi),
-		"pete":    fmt.Sprintf("%s/31191440/services/10282291592/resources/10282190294", genbookapi),
-		"brandon": fmt.Sprintf("%s/30377943/services/2394050193/resources/2394025610", genbookapi),
-		"luis":    fmt.Sprintf("%s/30250062/services/1173749692/resources/1173749696", genbookapi),
-		"zach":    fmt.Sprintf("%s/30302725/services/1547629284/resources/1547629288", genbookapi),
-		"paul":    fmt.Sprintf("%s/30309745/services/1603733980/resources/1603733984", genbookapi),
-		"kegan":   fmt.Sprintf("%s/30352805/services/2098565278/resources/2098565282", genbookapi),
+	// Service Variant Id determines which barbor! - This one is Hair Jordan
+	// TODO: Update to map of map[barber]svi
+	barbers := map[string]string{
+		"jordan": "8941492",
+		"kegan":  "9080419",
+		"pete":   "9098534",
 	}
 
-	var barbers []barber
-	for k, v := range  barberendpoints {
-		var b barber
-		b.Name = k
-		b.Img = fmt.Sprintf("/static/img/%s.jpeg", b.Name)
-
-		resp, err := http.Get(v)
+	for _, id := range barbers {
+		url := fmt.Sprintf("%s?start_date=%s&end_date=%s&service_variant_id=%s", bu, s, e, id)
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
-			logger.Fatal(err)
+			fmt.Println("error creating new request")
 		}
-
-		var r response
-		err = json.NewDecoder(resp.Body).Decode(&r)
+		req.Header.Add("x-api-key", "web-e3d812bf-d7a2-445d-ab38-55589ae6a121")
+		resp, err := client.Do(req)
 		if err != nil {
-			logger.Fatal(err)
+			fmt.Println("error completing request")
+		}
+		defer resp.Body.Close()
+
+		var data struct {
+			TimeSlots interface{} `json:"time_slots"`
+			Resources interface{} `json:"resources"`
 		}
 
-		for _, apt := range r.Bookingdates {
-
-			year := apt[:4]
-			month := apt[4:6]
-			day := apt[6:8]
-
-			dts := fmt.Sprintf("%s-%s-%sT00:00:00.000Z", year, month, day)
-
-			t, err := time.Parse(time.RFC3339, dts)
-			if err != nil {
-				logger.Fatal(err)
-			}
-
-			now := time.Now()
-			dif := t.Sub(now)
-
-			if dif < 7*24*time.Hour {
-				b.Apts = append(b.Apts, t)
-			}
-
+		err = ReadJSON(resp, &data)
+		if err != nil {
+			fmt.Println("error decoding")
+			fmt.Println(err)
 		}
-		barbers = append(barbers, b)
+
+		fmt.Println(data.TimeSlots)
 	}
 
-	srv := &http.Server{
-		Addr:         ":4000",
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
-	}
-
-
-	tmpl := template.Must(template.ParseFiles("templates/index.html.tmpl"))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.Execute(w, barbers)
-	})
-
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static", fs))
-
-	err := srv.ListenAndServe()
-	logger.Fatal(err)
 }
